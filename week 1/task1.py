@@ -7,3 +7,13 @@ def home():
     return {
         'message': "hello world"
     }
+
+@app.get("/tasks")
+def tasks():
+    return { "name": "Task API", "version": "1.0", "endpoints": ["/tasks"] }
+
+@app.get("/health")
+def health():
+    return {
+        "status":"ok"
+    }
