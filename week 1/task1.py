@@ -19,6 +19,7 @@ in_memory = [
         "done": False
     }
 ]
+next_id = 4
 
 @app.get('/')
 def home():
@@ -43,6 +44,29 @@ def task(task_id:int):
         detail=f"Task {task_id} not found"
     )
 
+@app.post("/tasks")
+def add_task(title:str | None):
+    global next_id
+    if title is None:
+        raise HTTPException(
+            status_code=400,
+            detail='title not provided'
+        )
+
+    in_memory.append(
+        {
+            "id": next_id,
+            'title': title,
+            'done': False
+        }
+    )
+
+    next_id +=1
+
+    return HTTPException(
+        status_code= 201,
+        detail='task added succesfully'
+    )
 
 
 @app.get("/health")
