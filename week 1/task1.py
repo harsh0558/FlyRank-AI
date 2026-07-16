@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -21,6 +22,11 @@ in_memory = [
 ]
 next_id = 4
 
+class taskSchema(BaseModel):
+    id:int
+    title:str
+    done:bool
+
 @app.get('/')
 def home():
     return {
@@ -39,7 +45,7 @@ def task(task_id:int):
         if t.get('id') == task_id:
             return t
     
-    return HTTPException(
+    raise HTTPException(
         status_code=404,
         detail=f"Task {task_id} not found"
     )
@@ -63,11 +69,43 @@ def add_task(title:str | None):
 
     next_id +=1
 
-    return HTTPException(
+    raise HTTPException(
         status_code= 201,
         detail='task added succesfully'
     )
 
+
+@app.put("/tasks/{task_id}")
+def update(task:taskSchema):
+    update_task = None
+    
+    for t in in_memory:
+        if t.get('id') == task.id:
+            update_task = t
+            break
+    
+    if update_task is None:
+        raise HTTPException(
+            status_code=404,
+            detail= 'task not avaliable'
+        )
+    t['title'] = task.title
+    t['done'] = task.done
+
+    return {
+        'updated task': t
+    }
+
+@app.delete('/tasks/{task_id}')
+def delete(task_id:int):
+    for t in in_memory:
+        if t.get('id') == task_id:
+            in_memory.remove(t)
+            break
+
+    return {
+        'message':'task removed successfully'
+    }
 
 @app.get("/health")
 def health():
