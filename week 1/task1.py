@@ -27,19 +27,19 @@ class taskSchema(BaseModel):
     title:str
     done:bool
 
-@app.get('/')
+@app.get('/', summary="Home endpoint")
 def home():
     return {
         'message': "hello world"
     }
 
-@app.get("/tasks")
+@app.get("/tasks", summary="Get all tasks")
 def tasks():
     return {
         "all_tasks": in_memory
     }
 
-@app.get("/tasks/{task_id}")
+@app.get("/tasks/{task_id}", summary="Get a task by ID")
 def task(task_id:int):
     for t in in_memory:
         if t.get('id') == task_id:
@@ -50,7 +50,7 @@ def task(task_id:int):
         detail=f"Task {task_id} not found"
     )
 
-@app.post("/tasks")
+@app.post("/tasks", summary="Create a new task")
 def add_task(title:str | None):
     global next_id
     if title is None:
@@ -75,7 +75,7 @@ def add_task(title:str | None):
     )
 
 
-@app.put("/tasks/{task_id}")
+@app.put("/tasks/{task_id}", summary="Update an existing task")
 def update(task:taskSchema):
     update_task = None
     
@@ -96,18 +96,21 @@ def update(task:taskSchema):
         'updated task': t
     }
 
-@app.delete('/tasks/{task_id}')
+@app.delete('/tasks/{task_id}', summary="Delete a task")
 def delete(task_id:int):
     for t in in_memory:
         if t.get('id') == task_id:
             in_memory.remove(t)
-            break
+            return {
+                'message':'task removed successfully'
+            }
+    
+    raise HTTPException(
+        status_code=404,
+        detail= "couldn't find task"
+    )
 
-    return {
-        'message':'task removed successfully'
-    }
-
-@app.get("/health")
+@app.get("/health", summary="Check API health")
 def health():
     return {
         "status":"ok"
