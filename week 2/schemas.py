@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 
-class ValidateTask(BaseModel):
+class TaskSchema(BaseModel):
     id: int
+    title: str
+    done: bool
+
+class UpdateTaskSchema(BaseModel):
     title: str
     done: bool
