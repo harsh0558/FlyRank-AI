@@ -11,3 +11,4 @@ db = sessionLocal()
 
 db.add_all(tasks)
 db.commit()
+db.close()
