@@ -6,7 +6,7 @@ class Base(DeclarativeBase):
 
 class Tasks(Base):
 
-    __tablename__ = 'Tasks'
+    __tablename__ = 'tasks'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] 
