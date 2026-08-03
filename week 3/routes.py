@@ -1,23 +1,67 @@
-from fastapi import FastAPI
-from contextlib import asynccontextmanager
-from supabase import acreate_client, AsyncClient
-from dotenv import load_dotenv
-import os
-load_dotenv()
+from fastapi import APIRouter, status, Request, Depends
+from fastapi.responses import JSONResponse
+from supabase import AsyncClient
+from models import (
+    signupModel,
+    loginModel
+)
+from auth import userService
+from exception_handling import (
+    LoginFailed
+)
 
-url:str = str(os.getenv("SUPABASE_PROJECT_URL"))
-key:str = str(os.getenv("SUPABASE_PUBLIC_KEY"))
+router = APIRouter()
+
+user_service_obj = userService()
+def get_supabase(
+    request: Request
+) -> AsyncClient:
+    return request.app.state.supabase
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    supabase_client:AsyncClient = await acreate_client(
-        supabase_url=url,
-        supabase_key=key
+@router.post("/auth/signup")
+async def supabase_auth_signup(
+    credentials: signupModel,
+    client: AsyncClient = Depends(get_supabase)
+):
+    user = await user_service_obj.signup(
+        credentials.email,
+        credentials.password,
+        client
     )
 
-    app.state.supabase = supabase_client
+    return JSONResponse(
+        status_code = status.HTTP_201_CREATED,
+        content= {
+            "message":"user succesfully created",
+            "details":{
+                "user_id":user.id,
+                "email":user.email
+            }
+        }
+    )
 
-    yield
 
-app = FastAPI(lifespan=lifespan)
+@router.post("/auth/login")
+async def login(
+    credentials:loginModel,
+    client:AsyncClient = Depends(get_supabase),
+):
+    response = await user_service_obj.login(
+        credentials.email, 
+        credentials.password, 
+        client
+    )
+
+    if response.session is None or response.user is None:
+        raise LoginFailed()
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "email" : response.user.email,
+            "user_id": response.user.id,
+            "access_token": response.session.access_token,
+            "refresh_token": response.session.refresh_token
+        }
+    )
