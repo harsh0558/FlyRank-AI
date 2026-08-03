@@ -9,6 +9,7 @@ from auth import userService
 from exception_handling import (
     LoginFailed
 )
+from dependencies import TokenBearer
 
 router = APIRouter()
 
@@ -63,5 +64,23 @@ async def login(
             "user_id": response.user.id,
             "access_token": response.session.access_token,
             "refresh_token": response.session.refresh_token
+        }
+    )
+
+@router.get("/public/info")
+async def get_info():
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "message": "welcome stranger! This info is public"
+        }
+    )
+
+@router.get("/protected/profile")
+async def get_protected_profile(Token = Depends(TokenBearer())):
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "access_token":Token
         }
     )

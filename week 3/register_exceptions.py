@@ -3,6 +3,7 @@ from exception_handling import (
     LoginFailed,
     SignupFailed,
     EmailAlreadyRegistered,
+    AccessTokenNotProvided,
     create_exception_handler
 )
 
@@ -38,6 +39,17 @@ def register_exception_handlers(
             {
                 "success":False,
                 "message": "invalid login credentials"
+            }
+        )
+    )
+
+    app.add_exception_handler(
+        AccessTokenNotProvided,
+        create_exception_handler(
+            401,
+            {
+                "success":False,
+                "message": "access token required"
             }
         )
     )

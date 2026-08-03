@@ -13,6 +13,9 @@ class EmailAlreadyRegistered(Exception):
 class LoginFailed(Exception):
     pass
 
+class AccessTokenNotProvided(Exception):
+    pass
+
 def create_exception_handler(
         status_code:int,
         initial_detail:Any
