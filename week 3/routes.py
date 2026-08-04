@@ -7,7 +7,8 @@ from models import (
 )
 from auth import userService
 from exception_handling import (
-    LoginFailed
+    LoginFailed,
+    SignOutFailed
 )
 from dependencies import TokenBearer
 
@@ -77,10 +78,24 @@ async def get_info():
     )
 
 @router.get("/protected/profile")
-async def get_protected_profile(userDetails = Depends(TokenBearer())):
+async def get_protected_profile(userDetails:dict = Depends(TokenBearer())):
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
             "details":userDetails
+        }
+    )
+
+@router.post("/auth/logout")
+async def logout(token: str = Depends(TokenBearer()), client:AsyncClient = Depends(get_supabase)):
+    response = await user_service_obj.sign_out(client)
+
+    if response is False:
+        raise SignOutFailed
+    
+    return JSONResponse(
+        status_code=204,
+        content={
+            "message":"log out successfull"
         }
     )

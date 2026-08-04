@@ -9,7 +9,8 @@ from exception_handling import (
     LoginFailed,
     SignupFailed,
     EmailAlreadyRegistered,
-    UserNotFound
+    UserNotFound,
+    SignOutFailed
 )
 class userService:
     async def signup(
@@ -65,3 +66,18 @@ class userService:
         
         except Exception as e:
             raise UserNotFound()
+
+    async def sign_out(
+        self,
+        client:AsyncClient
+    ) -> bool:
+
+        try: 
+            response = await client.auth.sign_out()
+
+            if response is None:
+                return True
+
+            return False
+        except Exception as e:
+            raise SignOutFailed()

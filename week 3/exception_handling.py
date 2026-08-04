@@ -18,6 +18,9 @@ class AccessTokenNotProvided(Exception):
 class UserNotFound(Exception):
     pass
 
+class SignOutFailed(Exception):
+    pass
+
 def create_exception_handler(
         status_code:int,
         initial_detail:Any

@@ -1,8 +1,10 @@
 from email import message
+from ssl import CertificateError
 
 from fastapi import FastAPI
 from exception_handling import (
     LoginFailed,
+    SignOutFailed,
     SignupFailed,
     EmailAlreadyRegistered,
     AccessTokenNotProvided,
@@ -64,6 +66,17 @@ def register_exception_handlers(
             {
                 "success":False,
                 "message": "provided access token is incorrect"
+            }
+        )
+    )
+
+    app.add_exception_handler(
+        SignOutFailed,
+        create_exception_handler(
+            500,
+            {
+                "success":False,
+                "message":"error in logging client out"
             }
         )
     )
