@@ -77,10 +77,10 @@ async def get_info():
     )
 
 @router.get("/protected/profile")
-async def get_protected_profile(Token = Depends(TokenBearer())):
+async def get_protected_profile(userDetails = Depends(TokenBearer())):
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
-            "access_token":Token
+            "details":userDetails
         }
     )

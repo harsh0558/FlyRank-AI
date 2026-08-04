@@ -1,9 +1,12 @@
+from email import message
+
 from fastapi import FastAPI
 from exception_handling import (
     LoginFailed,
     SignupFailed,
     EmailAlreadyRegistered,
     AccessTokenNotProvided,
+    UserNotFound,
     create_exception_handler
 )
 
@@ -50,6 +53,17 @@ def register_exception_handlers(
             {
                 "success":False,
                 "message": "access token required"
+            }
+        )
+    )
+
+    app.add_exception_handler(
+        UserNotFound,
+        create_exception_handler(
+            401,
+            {
+                "success":False,
+                "message": "provided access token is incorrect"
             }
         )
     )

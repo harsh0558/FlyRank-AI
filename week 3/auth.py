@@ -1,15 +1,15 @@
 from supabase import AsyncClient
 from pydantic import EmailStr
-from supabase_auth import AuthResponse
 from supabase_auth.errors import AuthApiError 
 from supabase_auth.types import (
-    User,
+    User, 
     AuthResponse
 )
 from exception_handling import (
     LoginFailed,
     SignupFailed,
-    EmailAlreadyRegistered
+    EmailAlreadyRegistered,
+    UserNotFound
 )
 class userService:
     async def signup(
@@ -50,3 +50,18 @@ class userService:
         
         except AuthApiError as e:
             raise LoginFailed()
+
+    async def verify_access_token(
+        self,
+        token:str,
+        client: AsyncClient
+    ) -> str:
+        try:
+            response = await client.auth.get_user(token)
+            if response is None:
+                raise UserNotFound()
+
+            return response.user.id
+        
+        except Exception as e:
+            raise UserNotFound()

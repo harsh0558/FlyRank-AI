@@ -6,7 +6,6 @@ from fastapi.responses import JSONResponse
 class SignupFailed(Exception):
     pass
 
-
 class EmailAlreadyRegistered(Exception):
     pass
 
@@ -14,6 +13,9 @@ class LoginFailed(Exception):
     pass
 
 class AccessTokenNotProvided(Exception):
+    pass
+
+class UserNotFound(Exception):
     pass
 
 def create_exception_handler(
